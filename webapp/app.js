@@ -1,29 +1,36 @@
 var express = require('express');
-var routes = require('./routes');
+var path = require('path');
+var fs = require('fs');
 
-var app = module.exports = express.createServer();
+var app = express();
 
-// Configuration
-app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+app.use((req, res, next) => {
+  console.log("Request IP: " + req.url);
+  console.log("Request date: " + new Date());
+  next();
 });
 
-app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
-  app.configure('production', function(){
-  app.use(express.errorHandler());
+app.use((req, res, next) => {
+  var filePath = path.join(__dirname, "static", req.url);
+  fs.stat(filePath, function(err, fileInfo){
+    if(err){
+      next();
+      return;
+    }
+
+    if(fileInfo.isFile()){
+      res.sendFile(filePath);      
+    } else {
+      next();
+    }
+  });
 });
 
-  // Routes
-  app.get('/', routes.index);
-  
-  app.listen(3000, function(){
-  console.log("Express server listening on port %d in %s mode", app.address().port,
-  app.settings.env);
+app.use(function(req, res) {
+  res.status(404);
+  res.send("File not found!");
 });
+
+app.listen(3000, function() {
+  console.log('App started on port 3000');
+})
