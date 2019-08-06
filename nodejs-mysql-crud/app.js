@@ -1,18 +1,18 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+var app = express();
 
-var mysql = require('mysql')
+var mysql = require('mysql');
 
 /**
  * This middleware provides a consistent API 
  * for MySQL connections during request/response life cycle
  */ 
-var myConnection  = require('express-myconnection')
+var myConnection  = require('express-myconnection');
 /**
  * Store database credentials in a separate config.js file
  * Load the file/module and its values
  */ 
-var config = require('./config')
+var config = require('./config');
 var dbOptions = {
 	host:	  config.database.host,
 	user: 	  config.database.user,
